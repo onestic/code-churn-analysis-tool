@@ -13,7 +13,7 @@ Indentation as a Proxy for Complexity Metrics: http://softwareprocess.es/x/x/hin
 1. Clone the repo:
 
 	```
-	git clone git@bitbucket.org:valentinboyanov/code-churn-analysis.git
+	git clone git@github.com:onestic/code-churn-analysis-tool.git
 	```
 	
 2. Change directory:
