@@ -9,12 +9,12 @@ class ScriptArguments
         $this->arguments = $arguments;
     }
 
-    public function projectDir()
+    public function projectDirectory()
     {
         return $this->arguments[1];
     }
 
-    public function projectKey()
+    public function projectTaskKey()
     {
         return isset($this->arguments[2]) ? $this->arguments[2] : null;
     }

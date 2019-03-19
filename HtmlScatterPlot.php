@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-class HtmlPlot
+class HtmlScatterPlot
 {
     private $analysis;
     private $template;
@@ -16,11 +16,11 @@ class HtmlPlot
         $this->result = $result;
     }
 
-    public function generate()
+    public function render()
     {
         $htmTemplate = file_get_contents($this->template);
-        $jsonAnaysis = json_encode($this->analysis);
-        $htmlContent = str_replace('{{analysis}}', $jsonAnaysis, $htmTemplate);
+        $jsonAnalysis = json_encode($this->analysis);
+        $htmlContent = str_replace('{{analysis}}', $jsonAnalysis, $htmTemplate);
 
         file_put_contents($this->result, $htmlContent);
     }

@@ -1,19 +1,19 @@
 <?php declare(strict_types=1);
 
-class  IndentationComplexity
+class  IndentationComplexityAnalyzer
 {
-    private $filepath;
+    private $indentationSize;
 
-    public function __construct($filepath)
+    public function __construct($indentationSize)
     {
-        $this->filepath = $filepath;
+        $this->indentationSize = $indentationSize;
     }
 
-    public function score() {
+    public function score($filepath) {
         $lineCount = 1;
         $totalLogicalIndentation = 1;
 
-        $handle = fopen($this->filepath, "r");
+        $handle = fopen($filepath, "r");
         while(!feof($handle)){
             $line = fgets($handle);
             $lineCount++;
@@ -22,7 +22,7 @@ class  IndentationComplexity
             }
             $lineIndentationSize = strlen($line)-strlen(ltrim($line));
             if ($lineIndentationSize > 3) {
-                $totalLogicalIndentation += ($lineIndentationSize/4);
+                $totalLogicalIndentation += ($lineIndentationSize/$this->indentationSize);
             }
         }
         fclose($handle);

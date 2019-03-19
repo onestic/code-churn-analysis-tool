@@ -1,22 +1,24 @@
 <?php
 
 require_once __DIR__ . '/ScriptArguments.php';
-require_once __DIR__ . '/Project.php';
-require_once __DIR__ . '/TaskFinder.php';
 require_once __DIR__ . '/History.php';
-require_once __DIR__ . '/IndentationComplexity.php';
-require_once __DIR__ . '/HtmlPlot.php';
+require_once __DIR__ . '/GitRepository.php';
+require_once __DIR__ . '/TaskFinder.php';
+require_once __DIR__ . '/IndentationComplexityAnalyzer.php';
+require_once __DIR__ . '/HtmlScatterPlot.php';
 
 $arguments = new ScriptArguments($argv);
 
-$project = new Project($arguments->projectDir(), $arguments->projectKey());
-
-$projectHistory = new History($project);
-
-$churnVsComplexity = new HtmlPlot(
-    $projectHistory->report(),
-    __DIR__ . '/analysis.html.template',
-    __DIR__ . '/analysis-result.html'
+$projectHistory = new History(
+    new GitRepository($arguments->projectDirectory()),
+    new TaskFinder($arguments->projectTaskKey()),
+    new IndentationComplexityAnalyzer(4)
 );
 
-$churnVsComplexity->generate();
+$churnVsComplexity = new HtmlScatterPlot(
+    $projectHistory->report(),
+    __DIR__ . '/scatter-plot.html.template',
+    __DIR__ . '/churn-vs-complexity.html'
+);
+
+$churnVsComplexity->render();

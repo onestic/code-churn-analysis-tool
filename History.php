@@ -2,17 +2,24 @@
 
 class History
 {
-    private $project;
+    private $projectRepository;
+    private $taskFinder;
+    private $complexityAnalyzer;
 
-    public function __construct(Project $project)
-    {
-        $this->project = $project;
+    public function __construct(
+        GitRepository $projectRepository,
+        TaskFinder $taskFinder,
+        IndentationComplexityAnalyzer $complexityAnalyzer
+    ) {
+        $this->projectRepository = $projectRepository;
+        $this->taskFinder = $taskFinder;
+        $this->complexityAnalyzer = $complexityAnalyzer;
     }
 
     public function report()
     {
         $report = ['files' => []];
-        $projectFiles = $this->project->filesThatHaveChangedMoreThan(2);
+        $projectFiles = $this->projectRepository->filesThatHaveChangedMoreThan(2);
 
         foreach ($projectFiles as $filepath) {
             $report['files'][] = $this->fileHistory($filepath);
@@ -27,31 +34,18 @@ class History
         $dates = [];
         $authors = [];
 
-        $process = shell_exec("git -C " . $this->project->rootDirectory() . " log --all --date=short --pretty=format:'%H---%ad---%aN---%s' --no-renames --no-merges " . $filepath);
+        $commits = $this->projectRepository->fileCommits($filepath);
 
-        $log = explode(PHP_EOL, $process);
+        foreach ($commits as $commit) {
+            $dates[] = $commit['date'];
+            $authors[] = $commit['author'];
 
-        $commits = [];
-
-        foreach ($log as $commitLine) {
-            $commitDetails = explode('---', $commitLine);
-            $dates[] = $commitDetails[1];
-            $authors[] = $commitDetails[2];
-
-            $commit = [
-                'hash' => $commitDetails[0],
-                'date' => $commitDetails[1],
-                'author' => $commitDetails[2]
-            ];
-
-            $foundTasks = $this->findTasksInCommitMessage($commitDetails[3]);
+            $foundTasks = $this->taskFinder->find($commit['message']);
 
             if (count($foundTasks) > 0) {
                 $tasks[] = $foundTasks[0];
                 $commit['tasks'] = $foundTasks[0];
             }
-
-            $commits[] = $commit;
         }
 
         return [
@@ -60,20 +54,10 @@ class History
             'active_days' => count(array_unique($dates)),
             'number_authors' => count(array_unique($authors)),
             'number_tasks' => count(array_unique($tasks)),
-            'complexity' => $this->indentationComplexityScore($this->project->fullFilepath($filepath)),
+            'complexity' => $this->complexityAnalyzer->score($filepath),
             'authors' => implode(',', array_unique($authors)),
             'tasks' => implode(', ', array_unique($tasks)),
             'commits' => $commits
         ];
-    }
-
-    public function indentationComplexityScore($filepath)
-    {
-        return (new IndentationComplexity($filepath))->score();
-    }
-
-    public function findTasksInCommitMessage($message)
-    {
-        return (new TaskFinder($this->project->key()))->find($message);
     }
 }
