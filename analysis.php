@@ -1,17 +1,22 @@
 <?php
 
-require_once __DIR__ . '/Reporter.php';
-require_once __DIR__ . '/Files.php';
-require_once __DIR__ . '/HistoryExtractor.php';
+require_once __DIR__ . '/ScriptArguments.php';
+require_once __DIR__ . '/Project.php';
+require_once __DIR__ . '/TaskFinder.php';
+require_once __DIR__ . '/History.php';
+require_once __DIR__ . '/IndentationComplexity.php';
+require_once __DIR__ . '/HtmlPlot.php';
 
-$projectDir = $argv[1];
-$taskPattern = isset($argv[2]) ? $argv[2] : null;
+$arguments = new ScriptArguments($argv);
 
-$files = new Files();
-$log = $files->gitLog($projectDir);
+$project = new Project($arguments->projectDir(), $arguments->projectKey());
 
-$extractor = new HistoryExtractor();
-$project = $extractor->extract($log, $projectDir, $taskPattern);
+$projectHistory = new History($project);
 
-$reporter = new Reporter();
-$reporter->generate($project);
+$churnVsComplexity = new HtmlPlot(
+    $projectHistory->report(),
+    __DIR__ . '/analysis.html.template',
+    __DIR__ . '/analysis-result.html'
+);
+
+$churnVsComplexity->generate();
