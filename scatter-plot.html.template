@@ -8,26 +8,10 @@
 </div>
 <script type="text/javascript">
 
-    mydata = {{analysis}};
-
-    var revisions = [];
-    var complexity = [];
-    var activeDays = [];
-    var filepaths = [];
-    var authors = [];
-
-    mydata.files.forEach(function (file) {
-        revisions.push(file.revisions);
-        complexity.push(file.complexity);
-        filepaths.push(file.filepath);
-        activeDays.push(file.active_days);
-        authors.push(file.number_authors);
-    });
-
     var trace = {
-        x: activeDays,
-        y: complexity,
-        text: filepaths,
+        x: {{axeX}},
+        y: {{axeY}},
+        text: {{labels}},
         mode: 'markers',
         type: 'scatter'
     };
@@ -35,7 +19,7 @@
     var layout = {
         height: 650,
         hovermode:'closest',
-        title:'Churn vs Complexity'
+        title:'{{title}}'
     };
 
     var data = [ trace ];

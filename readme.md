@@ -31,5 +31,5 @@ Indentation as a Proxy for Complexity Metrics: http://softwareprocess.es/x/x/hin
 4. View analysis result:
      
      ``` 
-     Open in your browser the generated 'analysis-result.html'
+     Open in your browser the generated 'churn-vs-complexity.html'
      ```  
