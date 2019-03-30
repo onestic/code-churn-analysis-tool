@@ -18,14 +18,14 @@ class History
 
     public function report()
     {
-        $report = ['files' => []];
+        $report = [];
         $projectFiles = $this->projectRepository->filesThatHaveChangedMoreThan(2);
 
         foreach ($projectFiles as $filepath) {
-            $report['files'][] = $this->fileHistory($filepath);
+            $report[] = $this->fileHistory($filepath);
         }
 
-        return $report;
+        return new Report($report);
     }
 
     public function fileHistory($filepath)
